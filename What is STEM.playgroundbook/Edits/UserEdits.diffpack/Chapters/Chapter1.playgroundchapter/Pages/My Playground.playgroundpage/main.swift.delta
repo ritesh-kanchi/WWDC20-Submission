@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Diff</key>
+	<array>
+		<dict>
+			<key>ModifiedContent</key>
+			<string>import SwiftUI
+import PlaygroundSupport
+
+// Main Views
+struct StartView: View {
+    @State var breakDown = false
+    @State var spin = false
+    var body: some View {
+        ZStack {
+            Color(darkBg)
+            VStack{
+            Title()
+                Subtitle(text: "A quick and fun way to learn exactly what STEM is.")
+                    .padding(.top)
+                Spacer()
+                StyledButton(text: "Let's find out", nextPage: $breakDown)
+                Spacer()
+                Subtitle(text: "This playground runs best in full screen.",weight: .semibold, size: 16)
+                    .padding(.bottom)
+            }
+            BreakDownView()
+            .offset(x: breakDown ? 0 : width, y: 0)
+            .animation(.spring())
+            }
+    }
+}
+
+struct BreakDownView: View {
+    @State var broken = false
+    @State var SNext = false
+    @State var TNext = false
+    @State var ENext = false
+    @State var MNext = false
+    @State var GraphNext = false
+    @State var OpportunityNext = false
+    @State var RecapIntroNext = false
+    var body: some View {
+        ZStack {
+            Color(darkBg)
+            HStack {
+            VStack {
+                Spacer()
+            Text("Let's\nBreak\nit Down.".uppercased())
+            .foregroundColor(Color.white)
+                .font(.system(size: 75, weight: .semibold, design: .default))
+                .tracking(broken ? 50 : 0)
+                .lineSpacing(50)
+                .animation(.default)
+                .onAppear() {
+                    DispatchQueue.main.asyncAfter(deadline: .now()+4) {
+                        self.broken = true
+                    }
+                }
+                Spacer()
+        }
+            .padding(.horizontal,50)
+                Spacer()
+        }
+            GoToNextView(stateToggle: $SNext)
+                .opacity(broken ? 1 : 0)
+            
+            IsForView(nextPage: $TNext, info: words[0])
+            .offset(x: 0, y: SNext ? 0 : -height)
+            .animation(.timingCurve(0.48, 0.01, 0.14, 1))
+            
+            IsForView(nextPage: $ENext,info: words[1])
+                .offset(x: 0, y: TNext ? 0 : -height)
+                .animation(.timingCurve(0, 0.32, 1, 0.6))
+            
+            IsForView(nextPage: $MNext,info: words[2])
+                .offset(x: 0, y: ENext ? 0 : -height)
+                .animation(.spring())
+            
+            IsForView(nextPage: $GraphNext,info: words[3])
+                .offset(x: 0, y: MNext ? 0 : -height)
+                .animation(.timingCurve(0.01, 0.73, 1, 0.6))
+            
+            GraphView(nextPage: $OpportunityNext)
+            .offset(x: GraphNext ? 0 : width, y: 0)
+            .animation(.timingCurve(0, 0.37, 1, 0.28))
+            
+            OpportunityView(nextPage : $RecapIntroNext)
+            .offset(x: 0, y: OpportunityNext ? 0 : height)
+            .animation(.timingCurve(0.38, 0.01, 1, 0.46))
+            
+            RecapIntroView()
+                .offset(x: 0, y: RecapIntroNext ? 0 : height)
+                .animation(.easeIn)
+        }
+    }
+}
+
+struct IsForView: View {
+    @Binding var nextPage: Bool
+    @State var jobs = false
+    var info: WordInfo
+    var body: some View {
+        ZStack {
+            Color(info.color)
+            ScrollView(.horizontal,showsIndicators: false) {
+            HStack {
+                VStack(alignment: .leading){
+                    HStack {
+                        Subtitle(text: "\(info.word.prefix(1))", weight: .bold, size: 150)
+                        Subtitle(text: "is for", weight: .bold, size: 75)
+                        .padding(.leading)
+                }
+                    Subtitle(text: info.word, weight: .bold, size: 75)
+                    Subtitle(text: info.definition)
+                    .lineLimit(nil)
+                    .frame(width: 400)
+                    .padding(.top,20)
+                }
+                .padding(.horizontal,50)
+                QuestionView(nextPage: $nextPage, image: info.question.image, question: info.question.question, answers: info.question.answers)
+            }
+            .foregroundColor(Color.white)
+        }
+    }
+    }
+}
+
+struct GraphView: View {
+    @Binding var nextPage: Bool
+    var body: some View {
+        ZStack {
+            Color(darkBg)
+            VStack {
+                HStack {
+                    Headline(text: "Projected Percentage Increases in STEM Jobs: 2010-2020")
+                    .padding([.top,.leading])
+                    Spacer()
+                    .lineLimit(nil)
+                    
+            }
+                HStack(alignment: .bottom, spacing: 8) {
+                    ForEach(percents) { i in
+                        Bar(percent: i.percent, color: i.color)
+                    }
+                }
+            .frame(height: 200)
+                HStack {
+                    VStack(alignment: .leading) {
+                        Subtitle(text: "Key", weight: .semibold, size: 24)
+                            .padding(.bottom,8)
+                        ForEach(percents) { item in
+                            KeyItem(itemName: item.title, color: item.color)
+                        }
+                    }
+                    .padding(.leading,20)
+                    Spacer()
+                    VStack {
+                        Text("International Society of Automation, April 2014")
+                        .italic()
+                        .font(.subheadline)
+                        .foregroundColor(Color.white)
+                            .offset(x: 0, y: -16)
+                        
+                        Subtitle(text: "Over the past decade, there has been a tremoundous increase across a variety of STEM jobs. There are tons of opportunities to get involved in and learn STEM.")
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 400)
+                            .padding([.top,.trailing],40)
+                        Spacer()
+                    }
+                }
+            }
+            GoToNextView(stateToggle: $nextPage)
+        }
+    }
+}
+
+struct OpportunityView: View {
+    @Binding var nextPage: Bool
+    var body: some View {
+        ZStack {
+            Color(darkBg)
+            VStack {
+                HStack {
+                    VStack(alignment: .leading) {
+                        Headline(text: "STEM Opportunities")
+                        Subtitle(text: "Tap on the cards below to learn about things you can do to learn STEM.")
+                        .padding(.top)
+                }
+                    .padding([.top,.leading])
+                    Spacer()
+                        .lineLimit(nil)
+                    
+                }
+                .padding(.bottom,32)
+
+                HStack {
+                    ForEach(opportunities) { opportunity in
+                        CardView(info: opportunity)
+                        if opportunity.title != "Online" {
+                            Spacer()
+                        }
+                    }
+                }
+
+            .padding(.horizontal,24)
+                Spacer()
+        }
+            GoToNextView(stateToggle: $nextPage)
+    }
+}
+}
+
+struct RecapIntroView: View {
+    @State var LastNext = false
+    @State var RecapNext = false
+    var body: some View {
+        ZStack {
+            Color(darkBg)
+            VStack {
+                Spacer()
+                Headline(text: "Here's a quick recap of what we learned.")
+                Spacer()
+            }
+            
+            GoToNextView(stateToggle: $RecapNext)
+            
+            RecapView(nextPage : $LastNext)
+                .offset(x: 0, y: RecapNext ? 0 : height)
+                .animation(.timingCurve(0.78, 0.01, 0.57, 0.58))
+            LastView()
+                .offset(x: 0, y: LastNext ? 0 : height)
+                .animation(.timingCurve(0.47, 0.51, 0.99, 0.45))
+        }
+    }
+}
+
+struct RecapView: View {
+    @Binding var nextPage: Bool
+    var body: some View {
+        ZStack {
+            Color(darkBg)
+            VStack {
+                ForEach(words) { word in
+                    RecapItem(info: word)
+                }
+            }
+            GoToNextView(stateToggle: $nextPage)
+        }
+    }
+}
+
+struct LastView: View {
+    var body: some View {
+        ZStack {
+            Color(darkBg)
+            VStack {
+                Subtitle(text: "🤩", size: 140)
+                    .padding(.all)
+                Headline(text: "Thank you for viewing my Playground!")
+                Subtitle(text: "I hope you will consider me for the WWDC20 Swift Student Challenge.")
+                    .padding(.vertical)
+                Image(uiImage: #imageLiteral(resourceName: "IMG_0982.PNG"))
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 200)
+            }
+        }
+    }
+}
+
+// Subviews
+
+struct Headline: View {
+    var text: String
+    var body: some View {
+        Subtitle(text: text, weight: .bold, size: 48)
+    }
+}
+
+struct Subtitle: View {
+    var text: String
+    var weight: Font.Weight = .medium
+    var color: Color = Color.white
+    var size = 20
+    var body: some View {
+        Text(text)
+            .font(.system(size: CGFloat(size), weight: weight, design: .default))
+            .foregroundColor(color)
+    }
+}
+
+struct StyledButton: View {
+    var text: String 
+    @Binding var nextPage: Bool
+    var body: some View {
+        Button(action: {
+            self.nextPage.toggle()
+        }, label: {
+            Subtitle(text: text.uppercased(), weight: .bold, color: Color.black)
+        })
+            .padding(.horizontal)
+            .padding(.vertical,10)
+            .background(Color.white)
+            .cornerRadius(100)
+    }
+}
+
+struct RecapItem: View {
+    var info: WordInfo
+    var body: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Subtitle(text: "\(info.word.prefix(1)) is for \(info.word).", weight: .bold,size: 75)
+                    .padding(.leading)
+                Spacer()
+            }
+            Spacer()
+        }
+        .padding(.all)
+        .frame(maxWidth: .infinity)
+        .background(Color(info.color))
+    }
+}
+
+struct CardView: View {
+    @State var flipped = false
+    var info: OppInfo
+    var body: some View {
+        ZStack {
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Subtitle(text: flipped ? "" : "\(info.title)".uppercased(), weight: .bold, color: Color.black, size: 24)
+                        .padding(.all)
+                }
+            }
+            .frame(width: 250, height: 350)
+            .background(
+                Image(uiImage: info.image)
+                    .resizable()
+                    .frame(width: 250, height: 350)
+            )
+                .cornerRadius(12)
+                .rotation3DEffect(self.flipped ? Angle(degrees: 180) : Angle(degrees: 0), axis: (x: CGFloat(0), y: CGFloat(10), z: CGFloat(0)))
+                .animation(.default)
+            Color(info.color)
+                .rotation3DEffect(self.flipped ? Angle(degrees: 180) : Angle(degrees: 0), axis: (x: CGFloat(0), y: CGFloat(10), z: CGFloat(0)))
+                .opacity(self.flipped ? 1 : 0)
+                .cornerRadius(12)
+            VStack(alignment: .leading) {
+                Subtitle(text: info.text, color: Color.black, size: 18)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .opacity(self.flipped ? 1 : 0)
+                Spacer()
+            }
+            .padding()
+        }
+        .frame(width: 250, height: 350)
+        .onTapGesture {
+            self.flipped.toggle()
+        }
+    }
+}
+
+struct GoToNextView: View {
+    @Binding var stateToggle: Bool
+    var body: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Spacer()
+                Button(action: {
+                    self.stateToggle.toggle()
+                }, label: {
+                    NextButton()
+                }
+                )
+            }
+        }
+    }
+}
+
+struct Bar: View {
+    @State var percent : CGFloat
+    var title = ""
+    var color: Color
+    var body: some View {
+        VStack {
+            Subtitle(text: String(format: "%.0f", Double(percent))+"%", weight: .semibold, color: Color.black, size: 20)
+            Rectangle()
+                .fill(color)
+                .frame(width: width / 7, height: getHeight())
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+        }
+    }
+    
+    func getHeight()-&gt;CGFloat {
+        return 200 / 100 * percent
+    }
+}
+
+struct KeyItem: View {
+    var itemName: String
+    var color: Color
+    var body: some View {
+        HStack {
+            KeyIcon(itemName: itemName, color: color)
+            Subtitle(text: itemName, weight: .semibold, size: 16)
+        }
+        .padding(.all,8)
+    }
+}
+
+struct KeyIcon: View {
+    var itemName: String
+    var color: Color
+    var body: some View {
+        VStack {
+            Subtitle(text: "\(itemName.prefix(1))", weight: .semibold, color: Color.white.opacity(0.75), size: 17)
+        }
+        .frame(width: 20, height: 20)
+        .background(color)
+        .cornerRadius(4)
+    }
+}
+
+struct QuestionView: View {
+    @Binding var nextPage: Bool
+    var image: UIImage
+    var question: String
+    var answers: [String]
+    @State var options: [String] = []
+    
+    var body: some View {
+        VStack {
+            Image(uiImage: image)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 400)
+            Subtitle(text: question, weight: .semibold, color: Color.black, size: 32)
+                .onAppear() {
+                    self.options = self.answers.shuffled()
+            }
+            VStack {
+                ForEach(options.shuffled(), id: \.self) {answer in 
+                    AnswerView(nextPage: self.$nextPage, answer: self.answers[0], option: answer, question: self.question)
+                }
+            }
+            Spacer()
+        }
+        .frame(width: 400)
+        .padding()
+        .background(Color.white)
+    }
+}
+
+struct AnswerView: View {
+    @Binding var nextPage: Bool
+    @State var tapped = false
+    @State var correct = false
+    @State var wrong = false
+    @State var alreadySelected = false
+    var answer: String
+    var option: String
+    var question: String
+    var body: some View {
+        HStack {
+            Image(systemName: correct ? "checkmark": wrong ? "xmark" : "")
+                .frame(width: 40, height: 40)
+                .background(correct ? Color.green : wrong ? Color.red : Color.black.opacity(0.15))
+                .cornerRadius(12)
+            Subtitle(text: option, weight: .medium, color: Color.black, size: 24)
+            Spacer()
+        }
+        .padding(.bottom,8)
+        .onTapGesture {
+            if !self.alreadySelected {
+                self.tapped.toggle()
+                if self.option == self.answer {
+                    self.correct = true
+                    self.nextPage = true
+                } else {
+                    self.wrong = true
+                }
+                self.alreadySelected = true
+            }
+        }
+        .alert(isPresented: $tapped, content: {
+            
+            Alert(title: Text(correct ? "Correct!" : "Try Again!"), message: Text(correct ? "You got it correct!" : "\(option) is the incorrect answer. \(question)"), dismissButton: .default(Text(correct ? "Next" : "Try Again")))
+        })
+    }
+}
+
+
+
+PlaygroundPage.current.setLiveView(StartView())
+</string>
+			<key>ModifiedRange</key>
+			<string>{0, 15608}</string>
+			<key>OriginalContent</key>
+			<string>
+</string>
+			<key>OriginalRange</key>
+			<string>{0, 1}</string>
+		</dict>
+	</array>
+	<key>File</key>
+	<string>Chapters/Chapter1.playgroundchapter/Pages/My Playground.playgroundpage/main.swift</string>
+</dict>
+</plist>
